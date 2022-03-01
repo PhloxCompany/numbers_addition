@@ -75,22 +75,6 @@ class _GameMainPageState extends State<GameMainPage> {
       ),
     );
   }
-
-  Widget itemList(index) {
-    return Container(
-      margin: const EdgeInsets.all(12),
-      color: index == _start ? Colors.red : Colors.white,
-      height: 100,
-      width: double.infinity,
-      child: const CircleAvatar(
-        child: Padding(
-          padding: EdgeInsets.all(12.0),
-          child: Text('9'),
-        ),
-        backgroundColor: Colors.white,
-      ),
-    );
-  }
 }
 
 class Cube extends StatelessWidget {
