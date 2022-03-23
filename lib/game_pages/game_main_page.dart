@@ -1,6 +1,9 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:numbers_addition/controller/provider/home_provider.dart';
+import 'package:provider/provider.dart';
 
 class GameMainPage extends StatefulWidget {
   const GameMainPage({Key? key}) : super(key: key);
@@ -11,31 +14,6 @@ class GameMainPage extends StatefulWidget {
 
 class _GameMainPageState extends State<GameMainPage> {
 
-  Timer? _timer;
-  int _start = 0;
-  int cubeIndex = -1;
-  int cubeCountD = 6;
-
-  void startTimer() {
-    const oneSec = Duration(milliseconds: 300);
-    _timer = Timer.periodic(
-      oneSec,
-          (Timer timer) {
-        if (_start == cubeCountD) {
-          setState(() {
-            timer.cancel();
-            _start = 0;
-          });
-        } else {
-          setState(() {
-            int i = _start * 10 + cubeIndex;
-            print(i);
-            _start++;
-          });
-        }
-      },
-    );
-  }
 
   @override
   void initState() {
@@ -45,32 +23,71 @@ class _GameMainPageState extends State<GameMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    double w = MediaQuery.of(context).size.width;
-    double h = MediaQuery.of(context).size.height;
-    double y = (h - w) / 2;
-    double cubeSize = w / cubeCountD;
+    double w = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double h = MediaQuery
+        .of(context)
+        .size
+        .height;
+
+    HomeProvider homeProvider = Provider.of(context , listen: false);
+
+    homeProvider.cubeSize = w / HomeProvider.x;
+    homeProvider.defaultTop = (h - (w / HomeProvider.x * HomeProvider.y)) / 2;
+
 
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          SizedBox(
-            height: y,
-          ),
-          Row(
-            children: List.generate(cubeCountD, (x) => InkWell(
-              onTap: (){
-                cubeIndex = x + 1;
-                startTimer();
-              },
-              child: Column(
-                children: List.generate(cubeCountD, (y) => Cube(index: y * 10 + (x + 1), size: cubeSize)),
+          Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              SizedBox(
+                height: homeProvider.defaultTop,
               ),
-            )),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(HomeProvider.x, (x) =>
+                    InkWell(
+                      onTap: () {
+                        if (homeProvider.canStart == true) {
+                          homeProvider.canStart = false;
+                          homeProvider.startTimer(context, x: x);
+                        }
+                      },
+                      child: Column(
+                        children: List.generate(HomeProvider.y, (y) =>
+                            Cube(index: y * 10 + (x + 1),)),
+                      ),
+                    )),
 
+              ),
+            ],
           ),
-          SizedBox(
-            height: y,
-          ),
+          Consumer<HomeProvider>(
+            builder: (context , provider , child ) {
+              return IgnorePointer(
+                child: Stack(
+                  children: List.generate(
+                      provider.cubes.length, (index) =>
+                      AnimatedPositioned(
+                          top:provider.cubes[index].top,
+                          left:provider.cubes[index].left,
+                          child: SizedBox(
+                            width: provider.cubeSize,
+                            height: provider.cubeSize,
+                            child: Container(
+                              margin: const EdgeInsets.all(1),
+                              color: provider.cubeColors[provider.numbersList.indexOf(provider.cubes[index].number)] ,
+                              child: Center(child: Text(provider.cubes[index].number.toString())),
+                            ),
+                          ), duration: const Duration(milliseconds: 300))),
+                ),
+              );
+            }
+          )
         ],
       ),
     );
@@ -78,19 +95,21 @@ class _GameMainPageState extends State<GameMainPage> {
 }
 
 class Cube extends StatelessWidget {
-  final double size;
+
   final int index;
 
-  const Cube({Key? key , required this.index , required this.size }) : super(key: key);
+
+  const Cube({Key? key, required this.index}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    HomeProvider homeProvider = Provider.of(context , listen: false);
     return SizedBox(
-      width: size,
-      height: size,
+      width: homeProvider.cubeSize,
+      height: homeProvider.cubeSize,
       child: Container(
         margin: const EdgeInsets.all(1),
-        color:index.isEven ? Colors.grey[100]: Colors.grey[200],
+        color: index.isEven ? Colors.grey[100] : Colors.grey[200],
         child: Center(child: Text(index.toString())),
       ),
     );
