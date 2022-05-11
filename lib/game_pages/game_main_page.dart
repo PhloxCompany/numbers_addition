@@ -73,8 +73,8 @@ class _GameMainPageState extends State<GameMainPage> {
                   children: List.generate(
                       provider.cubes.length, (index) =>
                       AnimatedPositioned(
-                          top:provider.cubes[index].top,
-                          left:provider.cubes[index].left,
+                          top: provider.cubes[index].top,
+                          left: provider.cubes[index].left,
                           child: SizedBox(
                             width: provider.cubeSize,
                             height: provider.cubeSize,

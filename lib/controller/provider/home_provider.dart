@@ -36,8 +36,7 @@ class HomeProvider extends ChangeNotifier {
         left: cubeSize * x,
         top: defaultTop,
         number: numbersList.last,
-      color: cubeColors[numbersList.indexOf(numbersList.last)]
-    ));
+        color: cubeColors[numbersList.indexOf(numbersList.last)]));
     notifyListeners();
     const oneSec = Duration(milliseconds: 300);
     timer = Timer.periodic(
@@ -53,16 +52,16 @@ class HomeProvider extends ChangeNotifier {
           ModelCube modelCube = cubes.last;
 
           int cubeBottomIndex = cubeIndex + 10;
-          int cubeExistsBottomIndex = cubes.indexWhere((element) => element.index == cubeBottomIndex,cubeBottomIndex);
-          if(cubeExistsBottomIndex >= 0){
-            if(cubes[cubeExistsBottomIndex].number == modelCube.number) {
+          int cubeExistsBottomIndex =
+              cubes.indexWhere((element) => element.index == cubeBottomIndex);
+          if (cubeExistsBottomIndex >= 0) {
+            if (cubes[cubeExistsBottomIndex].number == modelCube.number) {
               cubes.removeAt(cubeExistsBottomIndex);
               modelCube.number *= 2;
-              if(!numbersList.contains(modelCube.number)){
-
+              if (!numbersList.contains(modelCube.number)) {
                 numbersList.add(modelCube.number);
               }
-            }else {
+            } else {
               modelCube.index = cubeIndex;
               modelCube.top = defaultTop + (_start * cubeSize);
               timer.cancel();
